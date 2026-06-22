@@ -44,7 +44,7 @@ export const configuration = () => ({
     subject: process.env.VAPID_SUBJECT ?? 'mailto:ops@miang.ga',
   },
   draw: {
-    cron: process.env.DRAW_CRON ?? '0 0 * * *',
+    cron: process.env.DRAW_CRON ?? '0 20 * * *',
   },
 });
 

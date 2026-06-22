@@ -1,0 +1,141 @@
+name: miang
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PRODUCTION compose — uses YOUR existing external Postgres (no bundled database),
+# plus a dedicated Redis. Mirrors the Okoumé prod layout.
+#
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+#
+# Required in .env.prod:
+#   DATABASE_URL        full connection string to your Postgres (miang DB, see below)
+#   MIANG_DB_NETWORK    the docker network your Postgres container is attached to
+#   JWT_ACCESS_SECRET / JWT_REFRESH_SECRET   (openssl rand -hex 48)
+#
+# The `migrate` one-shot applies Prisma migrations, then — ONLY when SEED_TEST=true —
+# seeds demo data so you can present the app with a ready default login:
+#   « kevin_mba / miang1234 » (solde 12 500 F, KYC vérifié). Leave it false in prod.
+#
+# Public URL: https://miang.ayospush.com   ·   exposed port: 127.0.0.1:8091
+# ─────────────────────────────────────────────────────────────────────────────
+
+x-app-env: &app-env
+  NODE_ENV: production
+  API_PORT: '3000'
+  CORS_ORIGIN: ${CORS_ORIGIN:-https://miang.ayospush.com}
+  DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL in .env.prod}
+  REDIS_URL: redis://redis:6379
+  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?set JWT_ACCESS_SECRET in .env.prod}
+  JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+  JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET in .env.prod}
+  JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+  # OTP: ayospush → AyosPush (WhatsApp template) · console → code printed to logs
+  OTP_PROVIDER: ${OTP_PROVIDER:-console}
+  AYOSPUSH_API_URL: ${AYOSPUSH_API_URL:-https://ayospush.com/api/v1}
+  AYOSPUSH_API_KEY: ${AYOSPUSH_API_KEY:-}
+  AYOSPUSH_API_SECRET: ${AYOSPUSH_API_SECRET:-}
+  AYOSPUSH_PHONE_NUMBER_ID: ${AYOSPUSH_PHONE_NUMBER_ID:-}
+  AYOSPUSH_TEMPLATE_NAME: ${AYOSPUSH_TEMPLATE_NAME:-otp_verification}
+  MOBILE_MONEY_PROVIDER: ${MOBILE_MONEY_PROVIDER:-stub}
+  PAYMENTS_WEBHOOK_SECRET: ${PAYMENTS_WEBHOOK_SECRET:-change_me_webhook_secret}
+  VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+  VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+  VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:contact@ayospush.com}
+  # Draw fires at 20h00 (server local time).
+  DRAW_CRON: ${DRAW_CRON:-0 20 * * *}
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # One-shot: migrate, then seed ONLY when SEED_TEST=true (demo default login).
+  # Uses the builder image (has ts-node for `npm run seed`).
+  migrate:
+    build:
+      context: ./backend
+      target: builder
+    environment:
+      <<: *app-env
+      SEED_TEST: ${SEED_TEST:-false}
+    command:
+      - sh
+      - -c
+      - >
+        npx prisma migrate deploy &&
+        if [ "$$SEED_TEST" = "true" ]; then
+          echo "SEED_TEST=true → seeding demo data (connexion: kevin_mba / miang1234)";
+          npm run seed;
+        else
+          echo "SEED_TEST=$$SEED_TEST → no demo seed (production)";
+        fi
+    networks: [default, dbnet]
+    restart: 'no'
+
+  api:
+    build:
+      context: ./backend
+      target: runtime
+    restart: unless-stopped
+    command: ['node', 'dist/main.js']
+    environment:
+      <<: *app-env
+    depends_on:
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks: [default, dbnet]
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  worker:
+    build:
+      context: ./backend
+      target: runtime
+    restart: unless-stopped
+    command: ['node', 'dist/worker.js']
+    environment:
+      <<: *app-env
+    depends_on:
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks: [default, dbnet]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+    # Bound to localhost — front it with the host reverse proxy (domain + TLS).
+    ports:
+      - '127.0.0.1:${FRONTEND_PORT:-8091}:80'
+
+networks:
+  default:
+  # Your existing Postgres container's network (so the app reaches it by name).
+  dbnet:
+    external: true
+    name: ${MIANG_DB_NETWORK:?set MIANG_DB_NETWORK to your Postgres container's docker network}
+
+volumes:
+  redisdata:

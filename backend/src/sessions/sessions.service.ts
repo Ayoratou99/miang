@@ -49,7 +49,7 @@ export class SessionsService {
       data: {
         titre: input.titre.trim(),
         miseMin: input.miseMin,
-        drawAt: this.nextMidnight(),
+        drawAt: this.prochainTirage(),
         createdById: userId,
         serverSeed,
         serverSeedHash,
@@ -129,9 +129,13 @@ export class SessionsService {
     };
   }
 
-  private nextMidnight(): Date {
-    const d = new Date();
-    d.setHours(24, 0, 0, 0);
-    return d;
+  /** The next 20:00 local — the draw moment. */
+  private prochainTirage(): Date {
+    const t = new Date();
+    t.setHours(20, 0, 0, 0);
+    if (t.getTime() <= Date.now()) {
+      t.setDate(t.getDate() + 1);
+    }
+    return t;
   }
 }
