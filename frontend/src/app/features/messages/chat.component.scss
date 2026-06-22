@@ -195,6 +195,33 @@
   letter-spacing: 0.5px;
   margin-bottom: 8px;
 }
+.sheet-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 239, 225, 0.06);
+  border: 1px solid var(--line-2);
+  border-radius: 11px;
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+.sheet-search i {
+  color: var(--muted);
+  font-size: 15px;
+}
+.sheet-search input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--cream);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 10px 0;
+}
+.sheet-search input::placeholder {
+  color: var(--faint);
+}
 .sheet-list {
   display: flex;
   flex-direction: column;

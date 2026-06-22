@@ -24,6 +24,9 @@
           @if (item.path === '/messages' && unread() > 0) {
             <span class="bn-badge">{{ unread() }}</span>
           }
+          @if (item.path === '/amis' && nbDemandes() > 0) {
+            <span class="bn-badge">{{ nbDemandes() }}</span>
+          }
         </span>
         <span class="bn-label">{{ item.label }}</span>
       </a>

@@ -46,6 +46,31 @@ export class ChatService {
     return this.store.conversations().find((c) => c.sessionId === sessionId);
   }
 
+  /** Open (or start) the private conversation with a given user. */
+  getOrCreatePrivate(username: string): Conversation {
+    const existing = this.store
+      .conversations()
+      .find((c) => c.type === 'prive' && c.autreUsername === username);
+    if (existing) {
+      return existing;
+    }
+    const p = personneDe(username);
+    const conv: Conversation = {
+      id: `c-dm-${username}`,
+      type: 'prive',
+      titre: p.nom,
+      couleur: p.couleur,
+      autreUsername: username,
+      dernierMessage: '',
+      dernierLe: hhmm(now()),
+      nonLus: 0,
+      enLigne: this.store.isOnline(username),
+    };
+    this.store.conversations.update((list) => [conv, ...list]);
+    this.store.messages.update((map) => ({ ...map, [conv.id]: map[conv.id] ?? [] }));
+    return conv;
+  }
+
   /** A window of messages, ascending. Omit `beforeTs` for the latest page. */
   messagesPage(conversationId: string, beforeTs?: number, limit = 20): Observable<Page<Message>> {
     const all = this.store.messages()[conversationId] ?? [];

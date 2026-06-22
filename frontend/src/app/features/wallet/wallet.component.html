@@ -57,6 +57,13 @@
       <div class="sheet-grip"></div>
       <h3 class="sheet-title wm">{{ m === 'depot' ? 'Déposer' : 'Retirer' }}</h3>
 
+      @if (m === 'retrait' && !kycOk()) {
+        <div class="alert alert-coral" style="margin: 4px 0 14px">
+          <i class="ti ti-id"></i>
+          <div>Vérifie ton identité (KYC) avant de retirer tes gains. Réservé aux 18 ans et +.</div>
+        </div>
+        <a class="btn btn-gold sheet-cta" routerLink="/kyc"><i class="ti ti-id"></i> Vérifier mon identité</a>
+      } @else {
       <div class="field">Montant</div>
       <div class="input-row">
         <input class="input montant-input" inputmode="numeric" [value]="montant() ?? ''" (input)="onMontant($event)" placeholder="0" />
@@ -96,6 +103,7 @@
           {{ m === 'depot' ? 'Déposer' : 'Retirer' }} {{ montant() ? (montant() | fcfa) : '' }}
         }
       </button>
+      }
       <button class="btn btn-ghost" type="button" (click)="fermer()">Annuler</button>
     </div>
   </div>

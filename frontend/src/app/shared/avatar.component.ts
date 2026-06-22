@@ -9,20 +9,48 @@ const MAP: Record<Couleur, { bg: string; fg: string }> = {
   coral: { bg: '#FF6B4A', fg: '#07140F' },
 };
 
-/** Round initials avatar in the brand palette. */
+/** Round avatar — shows a photo when `image` is set, else initials in the palette. */
 @Component({
   selector: 'miang-avatar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<span class="avatar" [style.width.px]="taille()" [style.height.px]="taille()"
-    [style.background]="couleurs().bg" [style.color]="couleurs().fg"
-    [style.font-size.px]="police()">{{ texte() ?? auto() }}</span>`,
+  template: `
+    @if (image()) {
+      <img
+        class="avatar-img"
+        [src]="image()"
+        [style.width.px]="taille()"
+        [style.height.px]="taille()"
+        alt=""
+      />
+    } @else {
+      <span
+        class="avatar"
+        [style.width.px]="taille()"
+        [style.height.px]="taille()"
+        [style.background]="couleurs().bg"
+        [style.color]="couleurs().fg"
+        [style.font-size.px]="police()"
+        >{{ texte() ?? auto() }}</span
+      >
+    }
+  `,
+  styles: [
+    `
+      .avatar-img {
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        flex-shrink: 0;
+      }
+    `,
+  ],
 })
 export class AvatarComponent {
   readonly nom = input('');
-  /** Override the derived initials (e.g. a session title already abbreviated). */
   readonly texte = input<string | null>(null);
   readonly couleur = input<Couleur>('forest');
   readonly taille = input(40);
+  readonly image = input<string | null>(null);
 
   protected readonly auto = computed(() => initiales(this.nom()));
   protected readonly couleurs = computed(() => MAP[this.couleur()]);

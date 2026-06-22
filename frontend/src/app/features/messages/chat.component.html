@@ -55,9 +55,13 @@
     <div class="sheet-dim" (click)="inviteOuvert.set(false)">
       <div class="sheet" (click)="$event.stopPropagation()">
         <div class="sheet-grip"></div>
-        <div class="sheet-title">Inviter à une session</div>
+        <div class="sheet-title">Inviter à une session active</div>
+        <div class="sheet-search">
+          <i class="ti ti-search"></i>
+          <input [value]="rechercheInvite()" (input)="rechercheInvite.set($any($event.target).value)" placeholder="Rechercher une session…" />
+        </div>
         <div class="sheet-list">
-          @for (s of mesSessions(); track s.id) {
+          @for (s of sessionsInvite(); track s.id) {
             <button class="srow" type="button" (click)="envoyerInvite(s.id)">
               <span class="srow-info">
                 <span class="srow-name">{{ s.titre }}</span>

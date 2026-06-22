@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChatService } from '../../core/data/chat.service';
-import { Conversation, ConversationType } from '../../core/models';
+import { FriendsService } from '../../core/data/friends.service';
+import { Ami, Conversation, ConversationType } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar.component';
 import { InfiniteScrollDirective } from '../../shared/infinite-scroll.directive';
 
@@ -16,6 +17,7 @@ const PAGE = 12;
 })
 export class MessagesComponent {
   private readonly chat = inject(ChatService);
+  private readonly friends = inject(FriendsService);
   private readonly router = inject(Router);
 
   protected readonly onglet = signal<ConversationType>('session');
@@ -24,10 +26,12 @@ export class MessagesComponent {
 
   private readonly all = signal<Conversation[]>([]);
   private readonly shown = signal(PAGE);
-
-  // Client-side reveal: deterministic, race-free.
   protected readonly items = computed(() => this.all().slice(0, this.shown()));
   protected readonly hasMore = computed(() => this.shown() < this.all().length);
+
+  // Compose: pick a friend → open the DM.
+  protected readonly composeOuvert = signal(false);
+  protected readonly amis = signal<Ami[]>([]);
 
   private reqId = 0;
 
@@ -67,5 +71,16 @@ export class MessagesComponent {
     } else {
       this.router.navigate(['/messages', c.id]);
     }
+  }
+
+  ouvrirCompose(): void {
+    this.composeOuvert.set(true);
+    this.friends.amis().subscribe((a) => this.amis.set(a));
+  }
+
+  demarrerDM(username: string): void {
+    const conv = this.chat.getOrCreatePrivate(username);
+    this.composeOuvert.set(false);
+    this.router.navigate(['/messages', conv.id]);
   }
 }

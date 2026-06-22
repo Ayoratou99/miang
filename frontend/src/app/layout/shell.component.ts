@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ChatService } from '../core/data/chat.service';
+import { FriendsService } from '../core/data/friends.service';
 import { OnboardingService } from '../core/onboarding.service';
 import { PushService } from '../core/push.service';
 import { PwaInstallService } from '../core/pwa-install.service';
@@ -24,13 +25,16 @@ export class ShellComponent implements OnInit {
   protected readonly onboarding = inject(OnboardingService);
   private readonly push = inject(PushService);
   private readonly chat = inject(ChatService);
+  private readonly friends = inject(FriendsService);
 
   protected readonly unread = this.chat.totalNonLus;
+  protected readonly nbDemandes = this.friends.nbDemandes;
   protected readonly installDismissed = signal(false);
 
   protected readonly nav: NavItem[] = [
     { path: '/accueil', icon: 'ti-home', label: 'Accueil' },
     { path: '/messages', icon: 'ti-message-circle', label: 'Messages' },
+    { path: '/amis', icon: 'ti-users', label: 'Amis' },
     { path: '/portefeuille', icon: 'ti-wallet', label: 'Portefeuille' },
     { path: '/info', icon: 'ti-info-circle', label: 'Info' },
   ];

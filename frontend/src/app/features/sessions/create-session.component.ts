@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { SessionsService } from '../../core/data/sessions.service';
+import { CropperComponent } from '../../shared/cropper.component';
 import { FcfaPipe } from '../../shared/fcfa.pipe';
 
 @Component({
   selector: 'miang-create-session',
-  imports: [RouterLink, FcfaPipe],
+  imports: [RouterLink, FcfaPipe, CropperComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './create-session.component.html',
   styleUrl: './create-session.component.scss',
@@ -24,7 +25,15 @@ export class CreateSessionComponent {
   protected readonly busy = signal(false);
   protected readonly error = signal<string | null>(null);
 
+  // Image upload + crop
+  protected readonly imageBrute = signal<string | null>(null);
+  protected readonly cropperOuvert = signal(false);
+
   protected readonly valide = computed(() => this.titre().trim().length >= 3 && this.miseMin() >= 100);
+  protected readonly coverEstImage = computed(() => {
+    const c = this.cover();
+    return !!c && (c.startsWith('data:') || c.startsWith('http'));
+  });
 
   onMise(value: string): void {
     const n = Number(value.replace(/\D/g, ''));
@@ -38,6 +47,30 @@ export class CreateSessionComponent {
 
   toggleCover(c: string): void {
     this.cover.set(this.cover() === c ? null : c);
+  }
+
+  onFichier(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imageBrute.set(reader.result as string);
+      this.cropperOuvert.set(true);
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  onCropped(dataUrl: string): void {
+    this.cover.set(dataUrl);
+    this.cropperOuvert.set(false);
+    this.imageBrute.set(null);
+  }
+
+  onCropAnnule(): void {
+    this.cropperOuvert.set(false);
+    this.imageBrute.set(null);
   }
 
   submit(): void {

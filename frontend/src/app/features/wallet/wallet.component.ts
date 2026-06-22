@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
 import { WalletService } from '../../core/data/wallet.service';
 import { OperateurId, Transaction, TxType } from '../../core/models';
 import { FcfaPipe } from '../../shared/fcfa.pipe';
@@ -15,10 +16,13 @@ type Mode = 'depot' | 'retrait' | null;
 })
 export class WalletComponent {
   private readonly wallet = inject(WalletService);
+  private readonly auth = inject(AuthService);
 
   protected readonly solde = this.wallet.solde;
   protected readonly transactions = this.wallet.transactions;
   protected readonly operateurs = this.wallet.operateurs;
+  /** KYC must be verified before a withdrawal (rule: 18+ & identity). */
+  protected readonly kycOk = computed(() => this.auth.currentUser()?.kyc === 'verifie');
 
   protected readonly mode = signal<Mode>(null);
   protected readonly montant = signal<number | null>(null);

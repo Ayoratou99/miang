@@ -1,0 +1,79 @@
+.cr-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: rgba(0, 0, 0, 0.66);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.cr-dialog {
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 320px;
+  padding: 18px;
+}
+.cr-title {
+  font-size: 16px;
+  margin: 0 0 14px;
+  text-align: center;
+  color: var(--gold);
+}
+.cr-stage {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #05100b;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+.cr-stage:active {
+  cursor: grabbing;
+}
+.cr-img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+  will-change: transform;
+}
+.cr-mask {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  border: 2px solid rgba(243, 182, 31, 0.85);
+}
+.cr-mask.cercle {
+  border-radius: 50%;
+}
+.cr-zoom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 2px 4px;
+  color: var(--muted);
+}
+.cr-zoom i {
+  font-size: 16px;
+}
+.cr-zoom input {
+  flex: 1;
+  accent-color: var(--gold);
+}
+.cr-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.cr-actions .btn {
+  flex: 1;
+}

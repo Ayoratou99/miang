@@ -30,7 +30,15 @@
         <span class="conv-mid">
           <span class="conv-title">
             {{ c.titre }}
-            @if (c.type === 'prive') { <span class="prive-tag">privé</span> }
+            @if (c.type === 'session') {
+              @if (c.sessionTermine) {
+                <span class="stag termine">terminée</span>
+              } @else {
+                <span class="stag active">active</span>
+              }
+            } @else {
+              <span class="prive-tag">privé</span>
+            }
           </span>
           <span class="conv-last muted">{{ c.dernierMessage }}</span>
         </span>
@@ -45,7 +53,7 @@
           <i class="ti ti-message-off"></i>
           @if (recherche()) { Aucune conversation pour « {{ recherche() }} ». }
           @else if (onglet() === 'session') { Rejoins une session pour discuter. }
-          @else { Pas encore de message privé. }
+          @else { Pas encore de message privé — touche + pour écrire à un ami. }
         </div>
       }
     }
@@ -54,4 +62,33 @@
     }
     <div miangInfiniteScroll [disabled]="loading() || !hasMore()" (reached)="chargerSuite()"></div>
   </div>
+
+  <!-- Compose: new private message -->
+  <button class="fab" type="button" (click)="ouvrirCompose()" aria-label="Nouveau message"><i class="ti ti-plus"></i></button>
+
+  @if (composeOuvert()) {
+    <div class="sheet-dim" (click)="composeOuvert.set(false)">
+      <div class="sheet" (click)="$event.stopPropagation()">
+        <div class="sheet-grip"></div>
+        <div class="sheet-title">Écrire à un ami</div>
+        <div class="sheet-list">
+          @for (a of amis(); track a.id) {
+            <button class="frow" type="button" (click)="demarrerDM(a.username)">
+              <span class="frow-av">
+                <miang-avatar [nom]="a.nom" [couleur]="a.couleur" [taille]="38" />
+                @if (a.enLigne) { <span class="online-dot sm"></span> }
+              </span>
+              <span class="frow-info">
+                <span class="frow-name">{{ a.nom }}</span>
+                <span class="frow-user muted">@{{ a.username }}</span>
+              </span>
+              <i class="ti ti-message-circle text-em"></i>
+            </button>
+          } @empty {
+            <div class="empty"><i class="ti ti-user-plus"></i> Ajoute des amis pour leur écrire.</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>

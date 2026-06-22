@@ -1,0 +1,84 @@
+<div class="screen">
+  <header class="topbar">
+    <a class="back" routerLink="/profil"><i class="ti ti-arrow-left"></i> Vérification d'identité</a>
+  </header>
+
+  @if (statut() === 'verifie') {
+    <div class="kyc-state ok">
+      <i class="ti ti-rosette-discount-check"></i>
+      <div class="kyc-state-title wm">Identité vérifiée</div>
+      <div class="kyc-state-text muted">Tu peux retirer tes gains. Merci !</div>
+    </div>
+  } @else if (statut() === 'en_attente') {
+    <div class="kyc-state wait">
+      <i class="ti ti-clock-hour-4"></i>
+      <div class="kyc-state-title wm">En attente de validation</div>
+      <div class="kyc-state-text muted">
+        Ton document ({{ libelleType(dossier()?.type) }} · n° {{ dossier()?.numero }}) est en cours
+        de vérification. Tu seras notifié sous 24h.
+      </div>
+    </div>
+    <div class="demo">
+      <div class="demo-lbl muted">Simulation back-office (démo)</div>
+      <div class="demo-actions">
+        <button class="btn btn-gold" type="button" (click)="simuler('verifie')"><i class="ti ti-check"></i> Confirmer</button>
+        <button class="btn btn-ghost" type="button" (click)="simuler('rejete')"><i class="ti ti-x"></i> Rejeter</button>
+      </div>
+    </div>
+  } @else {
+    @if (statut() === 'rejete') {
+      <div class="alert alert-coral">
+        <i class="ti ti-alert-triangle"></i>
+        <div>Ton dossier a été rejeté (document illisible ou non conforme). Recommence ci-dessous.</div>
+      </div>
+    }
+
+    <div class="steps-dots">
+      <span class="dot" [class.on]="etape() >= 1"></span>
+      <span class="dot" [class.on]="etape() >= 2"></span>
+    </div>
+
+    @if (etape() === 1) {
+      <div class="section-label">Type de pièce</div>
+      @for (t of types; track t.id) {
+        <button class="type-card" type="button" (click)="choisirType(t.id)">
+          <i class="ti {{ t.icon }}"></i>
+          <span>{{ t.label }}</span>
+          <i class="ti ti-chevron-right faint end"></i>
+        </button>
+      }
+    } @else {
+      <button class="retour" type="button" (click)="etape.set(1)">
+        <i class="ti ti-arrow-left"></i> {{ libelleType(type()) }}
+      </button>
+
+      <div class="field">Numéro de la pièce</div>
+      <input class="input" [value]="numero()" (input)="numero.set($any($event.target).value)" placeholder="Ex : 24-0012345" />
+
+      <div class="field">Document (recto)</div>
+      <label class="upload">
+        @if (docPreview()) {
+          <img [src]="docPreview()" alt="" />
+        } @else if (docNom()) {
+          <span class="upload-file"><i class="ti ti-file-check"></i> {{ docNom() }}</span>
+        } @else {
+          <span class="upload-empty"><i class="ti ti-upload"></i> Importer une photo / un scan</span>
+        }
+        <input type="file" accept="image/*,.pdf" hidden (change)="onDoc($event)" />
+      </label>
+
+      <div class="alert alert-coral kyc-note">
+        <i class="ti ti-shield-lock"></i>
+        <div>Réservé aux 18 ans et +. Tes documents servent uniquement à la vérification d'identité.</div>
+      </div>
+
+      <button class="btn btn-gold" type="button" [disabled]="!valide() || busy()" (click)="soumettre()">
+        @if (busy()) {
+          <span class="spinner"></span>
+        } @else {
+          <i class="ti ti-send"></i> Soumettre pour validation
+        }
+      </button>
+    }
+  }
+</div>

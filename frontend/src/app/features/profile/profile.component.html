@@ -8,10 +8,11 @@
 
   @if (user(); as u) {
     <div class="prof-head">
-      <button class="prof-av" type="button" (click)="changerPhoto()" aria-label="Modifier la photo">
-        <miang-avatar [nom]="u.nom" [couleur]="u.couleur" [taille]="84" />
+      <label class="prof-av" aria-label="Modifier la photo">
+        <miang-avatar [nom]="u.nom" [couleur]="u.couleur" [image]="u.avatarUrl ?? null" [taille]="84" />
         <span class="cam"><i class="ti ti-camera"></i></span>
-      </button>
+        <input type="file" accept="image/*" hidden (change)="onFichier($event)" />
+      </label>
       <div class="prof-name">{{ u.nom }}</div>
       <div class="prof-user muted">@{{ u.username }}</div>
       <a class="chip chip-em solde-chip" routerLink="/portefeuille">
@@ -34,20 +35,36 @@
       </div>
     </div>
 
-    @if (u.kyc !== 'verifie') {
-      <div class="alert alert-coral kyc">
+    @if (u.kyc === 'aucun' || u.kyc === 'rejete') {
+      <a class="alert alert-coral kyc" routerLink="/kyc">
         <i class="ti ti-id"></i>
         <div>
-          Vérifie ton identité (KYC) pour pouvoir retirer tes gains. Réservé aux 18 ans et +.
+          @if (u.kyc === 'rejete') {
+            Identité rejetée — relance la vérification pour pouvoir retirer.
+          } @else {
+            Vérifie ton identité (KYC) pour retirer tes gains. Réservé aux 18 ans et +.
+          }
         </div>
-      </div>
+      </a>
     }
 
     <div class="rows">
-      <button class="prow" type="button" (click)="changerPhoto()">
+      <label class="prow">
         <i class="ti ti-photo"></i> <span>Modifier la photo de profil</span>
+        <input type="file" accept="image/*" hidden (change)="onFichier($event)" />
         <i class="ti ti-chevron-right faint end"></i>
-      </button>
+      </label>
+      <a class="prow" routerLink="/kyc">
+        <i class="ti ti-id"></i> <span>Vérifier mon identité</span>
+        @if (u.kyc === 'verifie') {
+          <span class="chip chip-em">vérifié</span>
+        } @else if (u.kyc === 'en_attente') {
+          <span class="chip chip-gold">en attente</span>
+        } @else if (u.kyc === 'rejete') {
+          <span class="chip chip-coral">rejeté</span>
+        }
+        <i class="ti ti-chevron-right faint end"></i>
+      </a>
       <a class="prow" routerLink="/historique">
         <i class="ti ti-cards"></i> <span>Historique des sessions</span>
         <i class="ti ti-chevron-right faint end"></i>
@@ -86,5 +103,9 @@
         <i class="ti ti-logout"></i> <span>Déconnexion</span>
       </button>
     </div>
+  }
+
+  @if (cropperOuvert() && imageBrute()) {
+    <miang-cropper [src]="imageBrute()!" [forme]="'cercle'" (cropped)="onCropped($event)" (annule)="onCropAnnule()" />
   }
 </div>

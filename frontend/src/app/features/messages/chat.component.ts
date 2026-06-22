@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  computed,
   effect,
   inject,
   input,
@@ -40,6 +41,11 @@ export class ChatComponent {
 
   protected readonly inviteOuvert = signal(false);
   protected readonly mesSessions = signal<SessionMise[]>([]);
+  protected readonly rechercheInvite = signal('');
+  protected readonly sessionsInvite = computed(() => {
+    const q = this.rechercheInvite().trim().toLowerCase();
+    return this.mesSessions().filter((s) => !q || s.titre.toLowerCase().includes(q));
+  });
 
   private lastId = '';
 
@@ -90,9 +96,8 @@ export class ChatComponent {
 
   ouvrirInvite(): void {
     this.inviteOuvert.set(true);
-    if (!this.mesSessions().length) {
-      this.sessionsService.liste({}, 0, 20).subscribe((res) => this.mesSessions.set(res.items));
-    }
+    this.rechercheInvite.set('');
+    this.sessionsService.listeToutes({}).subscribe((list) => this.mesSessions.set(list));
   }
 
   envoyerInvite(sessionId: string): void {

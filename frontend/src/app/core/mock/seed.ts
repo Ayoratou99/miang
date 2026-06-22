@@ -280,7 +280,7 @@ const PHRASES = [
   '241 représente', 'Qui est chaud ?', 'Minuit… euh 20h ça approche',
 ];
 
-export function genConversations(sessions: SessionMise[]): Conversation[] {
+export function genConversations(sessions: SessionMise[], history: SessionMise[] = []): Conversation[] {
   const convs: Conversation[] = [];
   // A session conversation for the sessions I'm registered in + a few popular ones.
   const sessionConvs = sessions.filter((s) => s.inscrit).slice(0, 6);
@@ -295,6 +295,21 @@ export function genConversations(sessions: SessionMise[]): Conversation[] {
       dernierLe: `2${i % 4}:0${i % 6}`,
       nonLus: i < 3 ? (i + 1) % 4 : 0,
       sessionId: s.id,
+      sessionTermine: false,
+    });
+  });
+  // A few terminated (drawn) session conversations → "terminée" tag + locked chat.
+  history.filter((s) => s.inscrit).slice(0, 4).forEach((s) => {
+    convs.push({
+      id: `c-${s.id}`,
+      type: 'session',
+      titre: s.titre,
+      couleur: couleurDepuis(s.id),
+      dernierMessage: `🏆 @${s.gagnantUsername} a raflé ${s.potTotal.toLocaleString('fr-FR')} F`,
+      dernierLe: 'hier',
+      nonLus: 0,
+      sessionId: s.id,
+      sessionTermine: true,
     });
   });
   // Private conversations.

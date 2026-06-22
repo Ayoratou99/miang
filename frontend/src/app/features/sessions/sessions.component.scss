@@ -145,6 +145,11 @@
 .cv-1 { background: rgba(22, 160, 122, 0.16); }
 .cv-2 { background: rgba(255, 107, 74, 0.16); }
 .cv-3 { background: rgba(14, 77, 56, 0.4); }
+.cover-img {
+  object-fit: cover;
+  align-self: stretch;
+  height: auto;
+}
 .session-body {
   flex: 1;
   min-width: 0;

@@ -7,7 +7,7 @@
     <div class="head-actions">
       <a class="chip chip-em" routerLink="/portefeuille"><i class="ti ti-wallet"></i> {{ solde() | fcfa }}</a>
       <a routerLink="/profil" aria-label="Profil">
-        <miang-avatar [nom]="user()?.nom ?? ''" [couleur]="user()?.couleur ?? 'forest'" [taille]="34" />
+        <miang-avatar [nom]="user()?.nom ?? ''" [couleur]="user()?.couleur ?? 'forest'" [image]="user()?.avatarUrl ?? null" [taille]="34" />
       </a>
     </div>
   </header>
@@ -58,7 +58,11 @@
     @for (s of items(); track s.id) {
       <button class="card tap session" type="button" (click)="ouvrir(s)">
         @if (s.coverImage) {
-          <span class="cover" [class]="'cv-' + s.id.length % 4">{{ s.coverImage }}</span>
+          @if (s.coverImage.startsWith('data:') || s.coverImage.startsWith('http')) {
+            <img class="cover cover-img" [src]="s.coverImage" alt="" />
+          } @else {
+            <span class="cover" [class]="'cv-' + s.id.length % 4">{{ s.coverImage }}</span>
+          }
         }
         <span class="session-body">
           <span class="session-top">

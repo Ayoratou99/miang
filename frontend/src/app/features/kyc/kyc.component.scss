@@ -1,0 +1,134 @@
+.kyc-state {
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px 18px;
+  margin-top: 8px;
+}
+.kyc-state > i {
+  font-size: 40px;
+}
+.kyc-state.ok > i {
+  color: var(--em);
+}
+.kyc-state.wait > i {
+  color: var(--gold);
+}
+.kyc-state-title {
+  font-size: 18px;
+  margin: 8px 0 4px;
+}
+.kyc-state-text {
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.demo {
+  margin-top: 16px;
+  border: 1px dashed var(--line-2);
+  border-radius: 12px;
+  padding: 12px;
+}
+.demo-lbl {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.demo-actions {
+  display: flex;
+  gap: 9px;
+}
+.demo-actions .btn {
+  flex: 1;
+}
+
+.steps-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 8px 0 16px;
+}
+.steps-dots .dot {
+  width: 28px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line-2);
+}
+.steps-dots .dot.on {
+  background: var(--gold);
+}
+
+.type-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 14px;
+  margin-bottom: 9px;
+  color: var(--cream);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.type-card > i:first-child {
+  color: var(--gold);
+  font-size: 20px;
+}
+.type-card span {
+  flex: 1;
+}
+
+.retour {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  color: var(--em);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+.upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  border: 1px dashed var(--line-2);
+  border-radius: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.upload img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+.upload-empty,
+.upload-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.upload-empty i,
+.upload-file i {
+  font-size: 18px;
+  color: var(--em);
+}
+.kyc-note {
+  margin-bottom: 14px;
+}

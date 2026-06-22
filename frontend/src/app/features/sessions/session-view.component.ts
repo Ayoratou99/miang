@@ -93,7 +93,8 @@ export class SessionViewComponent {
     this.sessionsService.get(this.id()).subscribe((s) => {
       this.session.set(s);
       this.mises.set(null);
-      if (s?.inscrit) {
+      // Load the chat history when registered OR when the session is over (read-only).
+      if (s?.inscrit || s?.statut === 'drawn') {
         this.chargerMessages();
       } else {
         this.messages.set([]);

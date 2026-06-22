@@ -87,6 +87,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/profile/profile.component').then((m) => m.ProfileComponent),
       },
       {
+        path: 'kyc',
+        title: 'Vérification d’identité — MIANG',
+        loadComponent: () => import('./features/kyc/kyc.component').then((m) => m.KycComponent),
+      },
+      {
         path: 'info',
         title: 'Info — MIANG',
         loadComponent: () => import('./features/info/info.component').then((m) => m.InfoComponent),

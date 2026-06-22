@@ -4,7 +4,11 @@
       <a class="back-ic" routerLink="/accueil"><i class="ti ti-arrow-left"></i></a>
       <button class="sv-title" type="button" (click)="panneauOuvert.set(true)">
         @if (s.coverImage) {
-          <span class="cover">{{ s.coverImage }}</span>
+          @if (s.coverImage.startsWith('data:') || s.coverImage.startsWith('http')) {
+            <img class="cover-img" [src]="s.coverImage" alt="" />
+          } @else {
+            <span class="cover">{{ s.coverImage }}</span>
+          }
         }
         <span class="sv-title-txt">
           <span class="t">{{ s.titre }}</span>
@@ -27,7 +31,7 @@
       <div class="drawn"><i class="ti ti-trophy"></i> Gagnant : <strong>@{{ s.gagnantUsername }}</strong> a raflé {{ s.potTotal | fcfa }}</div>
     }
 
-    @if (s.inscrit) {
+    @if (s.inscrit || s.statut === 'drawn') {
       <div class="msgs" #liste (scroll)="onScroll()">
         @if (loadingOlder()) {
           <div class="older"><span class="spinner"></span></div>
@@ -51,34 +55,38 @@
         }
       </div>
 
-      @if (flash()) {
-        <div class="flash"><i class="ti ti-circle-check"></i> {{ flash() }}</div>
-      }
+      @if (s.statut === 'drawn') {
+        <div class="closed-footer"><i class="ti ti-lock"></i> Session terminée — chat fermé</div>
+      } @else {
+        @if (flash()) {
+          <div class="flash"><i class="ti ti-circle-check"></i> {{ flash() }}</div>
+        }
 
-      @if (mentions().length) {
-        <div class="mention-pop">
-          @for (p of mentions(); track p.username) {
-            <button type="button" (click)="choisirMention(p.username)">
-              <miang-avatar [nom]="p.nom" [couleur]="p.couleur" [taille]="24" />
-              <span class="mu">@{{ p.username }}</span>
-              <span class="mn muted">{{ p.nom }}</span>
-            </button>
-          }
+        @if (mentions().length) {
+          <div class="mention-pop">
+            @for (p of mentions(); track p.username) {
+              <button type="button" (click)="choisirMention(p.username)">
+                <miang-avatar [nom]="p.nom" [couleur]="p.couleur" [taille]="24" />
+                <span class="mu">@{{ p.username }}</span>
+                <span class="mn muted">{{ p.nom }}</span>
+              </button>
+            }
+          </div>
+        }
+
+        <div class="inbar">
+          <input
+            class="inbar-input"
+            [value]="brouillon()"
+            (input)="onInput($any($event.target).value)"
+            (keydown.enter)="envoyer()"
+            placeholder="Message… (@ pour mentionner)"
+          />
+          <button class="send" type="button" (click)="envoyer()" [disabled]="!brouillon().trim()" aria-label="Envoyer">
+            <i class="ti ti-send"></i>
+          </button>
         </div>
       }
-
-      <div class="inbar">
-        <input
-          class="inbar-input"
-          [value]="brouillon()"
-          (input)="onInput($any($event.target).value)"
-          (keydown.enter)="envoyer()"
-          placeholder="Message… (@ pour mentionner)"
-        />
-        <button class="send" type="button" (click)="envoyer()" [disabled]="!brouillon().trim()" aria-label="Envoyer">
-          <i class="ti ti-send"></i>
-        </button>
-      </div>
     } @else {
       <div class="locked">
         <div class="lock-card">

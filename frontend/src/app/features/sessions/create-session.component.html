@@ -27,7 +27,17 @@
 
     <div>
       <div class="field">Couverture (optionnel)</div>
+      @if (coverEstImage()) {
+        <div class="cover-preview">
+          <img [src]="cover()" alt="" />
+          <button type="button" class="cover-remove" (click)="cover.set(null)" aria-label="Retirer"><i class="ti ti-x"></i></button>
+        </div>
+      }
       <div class="covers">
+        <label class="cover-opt photo">
+          <i class="ti ti-photo"></i>
+          <input type="file" accept="image/*" hidden (change)="onFichier($event)" />
+        </label>
         @for (c of covers; track c) {
           <button type="button" class="cover-opt" [class.on]="cover() === c" (click)="toggleCover(c)">{{ c }}</button>
         }
@@ -51,4 +61,8 @@
       }
     </button>
   </div>
+
+  @if (cropperOuvert() && imageBrute()) {
+    <miang-cropper [src]="imageBrute()!" [forme]="'carre'" (cropped)="onCropped($event)" (annule)="onCropAnnule()" />
+  }
 </div>

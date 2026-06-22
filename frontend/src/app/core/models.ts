@@ -6,7 +6,9 @@
 /** Avatar palette keys — map to a {bg, fg} pair in the avatar component. */
 export type Couleur = 'forest' | 'em' | 'gold' | 'coral';
 
-export type KycStatut = 'aucun' | 'en_attente' | 'verifie';
+export type KycStatut = 'aucun' | 'en_attente' | 'verifie' | 'rejete';
+
+export type PieceType = 'cni' | 'passeport' | 'permis';
 
 export interface Utilisateur {
   id: string;
@@ -107,6 +109,8 @@ export interface Conversation {
   sessionId?: string;
   autreUsername?: string;
   enLigne?: boolean;
+  /** session conversation only — true once the session is drawn (chat fermé). */
+  sessionTermine?: boolean;
 }
 
 export type MessageType = 'text' | 'system' | 'invite';

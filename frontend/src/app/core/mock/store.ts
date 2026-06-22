@@ -46,7 +46,7 @@ export class MockStore {
   readonly transactions = signal<Transaction[]>(seedTransactions());
 
   constructor() {
-    const convs = genConversations(this.sessions());
+    const convs = genConversations(this.sessions(), this.history());
     this.conversations.set(convs);
     this.messages.set(genMessages(convs));
   }

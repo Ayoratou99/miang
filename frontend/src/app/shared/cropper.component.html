@@ -1,0 +1,37 @@
+<div class="cr-dim" (click)="cancel()">
+  <div class="cr-dialog" (click)="$event.stopPropagation()">
+    <h3 class="cr-title wm">Recadrer l'image</h3>
+
+    <div
+      class="cr-stage"
+      (pointerdown)="onDown($event)"
+      (pointermove)="onMove($event)"
+      (pointerup)="onUp($event)"
+      (pointercancel)="onUp($event)"
+    >
+      <img
+        #img
+        class="cr-img"
+        [src]="src()"
+        (load)="onImgLoad()"
+        [style.width.px]="baseW()"
+        [style.height.px]="baseH()"
+        [style.transform]="transform()"
+        draggable="false"
+        alt=""
+      />
+      <div class="cr-mask" [class.cercle]="forme() === 'cercle'"></div>
+    </div>
+
+    <label class="cr-zoom">
+      <i class="ti ti-zoom-out"></i>
+      <input type="range" min="1" max="3" step="0.01" [value]="zoom()" (input)="onZoom($event)" aria-label="Zoom" />
+      <i class="ti ti-zoom-in"></i>
+    </label>
+
+    <div class="cr-actions">
+      <button class="btn btn-ghost" type="button" (click)="cancel()">Annuler</button>
+      <button class="btn btn-gold" type="button" [disabled]="!ready()" (click)="confirm()">Valider</button>
+    </div>
+  </div>
+</div>
