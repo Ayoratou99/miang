@@ -1,0 +1,47 @@
+<div class="screen">
+  <header class="topbar">
+    <span class="page-title">Info</span>
+  </header>
+
+  <div class="hello card gold">
+    <miang-miango [taille]="62" />
+    <div>
+      <div class="hello-title text-gold">Salut, moi c'est Miango !</div>
+      <div class="hello-text muted">Je te résume tout ce qu'il faut savoir sur MIANG.</div>
+    </div>
+  </div>
+
+  <div class="section-label">C'est quoi MIANG ?</div>
+  <p class="para">
+    MIANG veut dire « argent » en fang. Tu rejoins une session, tu places ta mise, et à minuit
+    pile le sort désigne <span class="text-gold">un seul gagnant</span> qui rafle toute la
+    cagnotte.
+  </p>
+
+  <div class="section-label">Comment ça marche ?</div>
+  @for (e of etapes; track $index) {
+    <div class="step">
+      <span class="num">{{ $index + 1 }}</span>
+      <span>{{ e }}</span>
+    </div>
+  }
+
+  <div class="section-label">Jeu responsable</div>
+  <div class="alert alert-coral">
+    <i class="ti ti-shield-heart"></i>
+    <div>
+      Réservé aux <span style="font-weight: 600">18 ans et +</span>. Fixe-toi des limites et ne
+      mise que ce que tu peux te permettre de perdre. Besoin d'aide ?
+      <span class="text-coral" style="font-weight: 600">Parle à un conseiller.</span>
+    </div>
+  </div>
+
+  <button class="btn btn-outline gold guide-btn" type="button" (click)="rejouerGuide()">
+    <i class="ti ti-help-circle"></i> Revoir le guide
+  </button>
+
+  <div class="foot">
+    <div class="wm foot-brand">MIANG</div>
+    <div class="muted">deviens millionaire… comme la blague · v1.0</div>
+  </div>
+</div>

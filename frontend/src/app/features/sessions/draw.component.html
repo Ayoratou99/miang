@@ -1,0 +1,71 @@
+<div class="screen">
+  @if (session(); as s) {
+    <header class="topbar">
+      <a class="back" routerLink="/accueil"><i class="ti ti-arrow-left"></i> {{ s.titre }}</a>
+      <span class="chip chip-gold">{{ s.potTotal | fcfa }}</span>
+    </header>
+
+    <div class="draw-head">
+      <div class="kicker">Tirage à minuit</div>
+      <div class="clock wm">00:00:00</div>
+    </div>
+
+    <div class="wheel-wrap">
+      <div class="pointer"></div>
+      <svg
+        class="wheel"
+        [style.transform]="'rotate(' + rot() + 'deg)'"
+        width="180"
+        height="180"
+        viewBox="0 0 120 120"
+      >
+        <g>
+          <path d="M60,60 L114,60 A54,54 0 0 1 98.18,98.18 Z" fill="#0E4D38" />
+          <path d="M60,60 L98.18,98.18 A54,54 0 0 1 60,114 Z" fill="#F3B61F" />
+          <path d="M60,60 L60,114 A54,54 0 0 1 21.82,98.18 Z" fill="#16A07A" />
+          <path d="M60,60 L21.82,98.18 A54,54 0 0 1 6,60 Z" fill="#F3B61F" />
+          <path d="M60,60 L6,60 A54,54 0 0 1 21.82,21.82 Z" fill="#FF6B4A" />
+          <path d="M60,60 L21.82,21.82 A54,54 0 0 1 60,6 Z" fill="#F3B61F" />
+          <path d="M60,60 L60,6 A54,54 0 0 1 98.18,21.82 Z" fill="#0E4D38" />
+          <path d="M60,60 L98.18,21.82 A54,54 0 0 1 114,60 Z" fill="#F3B61F" />
+        </g>
+        <circle cx="60" cy="60" r="54" fill="none" stroke="#07140F" stroke-width="1.5" />
+        <circle cx="60" cy="60" r="16" fill="#07140F" stroke="#F3B61F" stroke-width="2" />
+        <polyline
+          points="52,68 52,52 60,61 68,52 68,68"
+          fill="none"
+          stroke="#F3B61F"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+
+    <div class="status">{{ statut() }}</div>
+
+    <div class="name-box wm" [class.won]="won()">{{ boxText() }}</div>
+
+    @if (resultat(); as r) {
+      <div class="reveal" [class.mine]="jaiGagne()">
+        <i class="ti ti-trophy"></i>
+        <div class="reveal-kicker">{{ jaiGagne() ? 'Tu rafles tout !' : 'Gagnant du soir' }}</div>
+        <div class="reveal-name wm">{{ '@' + r.gagnantUsername }}</div>
+        <div class="reveal-amount muted">rafle <span class="text-gold">{{ r.montant | fcfa }}</span></div>
+        <div class="fair">
+          <i class="ti ti-shield-check"></i> Tirage vérifiable · graine
+          <code>{{ r.serverSeedHash.slice(0, 16) }}…</code>
+        </div>
+      </div>
+    }
+
+    <button class="btn btn-outline gold spin" type="button" [disabled]="running()" (click)="spin()">
+      <i class="ti ti-refresh"></i> Relancer le suspense
+    </button>
+  } @else {
+    <header class="topbar">
+      <a class="back" routerLink="/accueil"><i class="ti ti-arrow-left"></i> Tirage</a>
+    </header>
+    <div class="empty"><i class="ti ti-mood-empty"></i> Session introuvable.</div>
+  }
+</div>

@@ -1,0 +1,57 @@
+<div class="screen">
+  <header class="topbar">
+    <span class="page-title">Messages</span>
+  </header>
+
+  <div class="search-box">
+    <i class="ti ti-search"></i>
+    <input
+      [value]="recherche()"
+      (input)="onRecherche($any($event.target).value)"
+      placeholder="Rechercher une conversation…"
+    />
+    @if (recherche()) {
+      <button class="clear" type="button" (click)="onRecherche('')" aria-label="Effacer"><i class="ti ti-x"></i></button>
+    }
+  </div>
+
+  <div class="tabs">
+    <button class="tab" [class.on]="onglet() === 'session'" type="button" (click)="setOnglet('session')">Sessions</button>
+    <button class="tab" [class.on]="onglet() === 'prive'" type="button" (click)="setOnglet('prive')">Privé</button>
+  </div>
+
+  <div class="convs">
+    @for (c of items(); track c.id) {
+      <button class="conv" type="button" (click)="ouvrir(c)">
+        <span class="conv-av">
+          <miang-avatar [nom]="c.titre" [couleur]="c.couleur" [taille]="40" />
+          @if (c.type === 'prive' && c.enLigne) { <span class="online-dot"></span> }
+        </span>
+        <span class="conv-mid">
+          <span class="conv-title">
+            {{ c.titre }}
+            @if (c.type === 'prive') { <span class="prive-tag">privé</span> }
+          </span>
+          <span class="conv-last muted">{{ c.dernierMessage }}</span>
+        </span>
+        <span class="conv-end">
+          <span class="conv-time muted">{{ c.dernierLe }}</span>
+          @if (c.nonLus > 0) { <span class="conv-badge">{{ c.nonLus }}</span> }
+        </span>
+      </button>
+    } @empty {
+      @if (!loading()) {
+        <div class="empty">
+          <i class="ti ti-message-off"></i>
+          @if (recherche()) { Aucune conversation pour « {{ recherche() }} ». }
+          @else if (onglet() === 'session') { Rejoins une session pour discuter. }
+          @else { Pas encore de message privé. }
+        </div>
+      }
+    }
+    @if (loading()) {
+      <div class="loading-row"><span class="spinner"></span></div>
+    }
+    <div miangInfiniteScroll [disabled]="loading() || !hasMore()" (reached)="chargerSuite()"></div>
+  </div>
+</div>

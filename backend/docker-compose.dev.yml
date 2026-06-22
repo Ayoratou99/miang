@@ -1,0 +1,38 @@
+# Dev dependencies only: Postgres + Redis. Run the API/worker on the host
+# (npm run start:dev / start:worker:dev) pointing at these via .env.
+#
+#   docker compose -f docker-compose.dev.yml up -d
+#
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: miang
+      POSTGRES_PASSWORD: miang
+      POSTGRES_DB: miang
+    ports:
+      - '5432:5432'
+    volumes:
+      - miang_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U miang -d miang']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6379:6379'
+    volumes:
+      - miang_redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  miang_pgdata:
+  miang_redisdata:

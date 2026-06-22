@@ -1,0 +1,90 @@
+<div class="screen">
+  <header class="topbar">
+    <span class="page-title">Profil</span>
+    <button class="link-ic" type="button" (click)="deconnexion()" aria-label="Déconnexion">
+      <i class="ti ti-logout"></i>
+    </button>
+  </header>
+
+  @if (user(); as u) {
+    <div class="prof-head">
+      <button class="prof-av" type="button" (click)="changerPhoto()" aria-label="Modifier la photo">
+        <miang-avatar [nom]="u.nom" [couleur]="u.couleur" [taille]="84" />
+        <span class="cam"><i class="ti ti-camera"></i></span>
+      </button>
+      <div class="prof-name">{{ u.nom }}</div>
+      <div class="prof-user muted">@{{ u.username }}</div>
+      <a class="chip chip-em solde-chip" routerLink="/portefeuille">
+        <i class="ti ti-wallet"></i> Solde {{ solde() | fcfa }}
+      </a>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-v wm">{{ u.stats.sessions }}</div>
+        <div class="stat-l muted">sessions</div>
+      </div>
+      <div class="stat">
+        <div class="stat-v wm">{{ u.stats.victoires }}</div>
+        <div class="stat-l muted">victoires</div>
+      </div>
+      <div class="stat">
+        <div class="stat-v wm">{{ compact(u.stats.gainsFcfa) }}</div>
+        <div class="stat-l muted">gains F</div>
+      </div>
+    </div>
+
+    @if (u.kyc !== 'verifie') {
+      <div class="alert alert-coral kyc">
+        <i class="ti ti-id"></i>
+        <div>
+          Vérifie ton identité (KYC) pour pouvoir retirer tes gains. Réservé aux 18 ans et +.
+        </div>
+      </div>
+    }
+
+    <div class="rows">
+      <button class="prow" type="button" (click)="changerPhoto()">
+        <i class="ti ti-photo"></i> <span>Modifier la photo de profil</span>
+        <i class="ti ti-chevron-right faint end"></i>
+      </button>
+      <a class="prow" routerLink="/historique">
+        <i class="ti ti-cards"></i> <span>Historique des sessions</span>
+        <i class="ti ti-chevron-right faint end"></i>
+      </a>
+      <a class="prow" routerLink="/portefeuille">
+        <i class="ti ti-history"></i> <span>Historique des gains</span>
+        <i class="ti ti-chevron-right faint end"></i>
+      </a>
+      <a class="prow" routerLink="/amis">
+        <i class="ti ti-users"></i> <span>Mes amis</span>
+        @if (nbDemandes() > 0) {
+          <span class="row-badge">{{ nbDemandes() }}</span>
+        }
+        <i class="ti ti-chevron-right faint end"></i>
+      </a>
+      @if (pushSupporte) {
+        <button class="prow" type="button" (click)="activerPush()">
+          <i class="ti ti-bell"></i>
+          <span>{{ pushOn() ? 'Notifications activées' : 'Activer les notifications' }}</span>
+          @if (pushOn()) {
+            <i class="ti ti-check text-em end"></i>
+          } @else {
+            <i class="ti ti-chevron-right faint end"></i>
+          }
+        </button>
+      }
+      <button class="prow" type="button" (click)="rejouerGuide()">
+        <i class="ti ti-help-circle"></i> <span>Revoir le guide</span>
+        <i class="ti ti-chevron-right faint end"></i>
+      </button>
+      <a class="prow" routerLink="/info">
+        <i class="ti ti-shield-heart"></i> <span>Jeu responsable</span>
+        <i class="ti ti-chevron-right faint end"></i>
+      </a>
+      <button class="prow danger" type="button" (click)="deconnexion()">
+        <i class="ti ti-logout"></i> <span>Déconnexion</span>
+      </button>
+    </div>
+  }
+</div>

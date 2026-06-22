@@ -1,0 +1,148 @@
+@if (session(); as s) {
+  <div class="sv">
+    <header class="sv-head">
+      <a class="back-ic" routerLink="/accueil"><i class="ti ti-arrow-left"></i></a>
+      <button class="sv-title" type="button" (click)="panneauOuvert.set(true)">
+        @if (s.coverImage) {
+          <span class="cover">{{ s.coverImage }}</span>
+        }
+        <span class="sv-title-txt">
+          <span class="t">{{ s.titre }}</span>
+          <span class="sub muted"><i class="ti ti-users"></i> {{ s.joueurs }} joueurs · {{ enLigneCount() }} en ligne</span>
+        </span>
+      </button>
+      <miang-countdown-ring [cible]="s.drawAt" />
+    </header>
+
+    <div class="sv-details">
+      <div class="d"><span class="muted">Cagnotte</span><span class="amount">{{ s.potTotal | fcfa }}</span></div>
+      <div class="d"><span class="muted">Mise min.</span><span class="v">{{ s.miseMin | fcfa: false }} F</span></div>
+      <div class="d">
+        <span class="muted">Joueurs</span>
+        <span class="v">{{ s.joueurs }}{{ s.maxParticipants ? ' / ' + s.maxParticipants : '' }}{{ !s.maxParticipants ? ' · ∞' : '' }}</span>
+      </div>
+    </div>
+
+    @if (s.statut === 'drawn') {
+      <div class="drawn"><i class="ti ti-trophy"></i> Gagnant : <strong>@{{ s.gagnantUsername }}</strong> a raflé {{ s.potTotal | fcfa }}</div>
+    }
+
+    @if (s.inscrit) {
+      <div class="msgs" #liste (scroll)="onScroll()">
+        @if (loadingOlder()) {
+          <div class="older"><span class="spinner"></span></div>
+        }
+        @for (m of messages(); track m.id) {
+          @if (m.type === 'system') {
+            <div class="sys"><span><i class="ti ti-coin"></i> {{ m.corps }}</span></div>
+          } @else if (m.moi) {
+            <div class="row mine"><div class="bub mine">{{ m.corps }}</div></div>
+          } @else {
+            <div class="row">
+              <button class="av-btn" type="button" (click)="voirProfil(m.auteurUsername)">
+                <miang-avatar [nom]="m.auteurNom ?? ''" [couleur]="m.auteurCouleur ?? 'forest'" [taille]="26" />
+              </button>
+              <div>
+                <div class="auth muted">{{ m.auteurNom }}</div>
+                <div class="bub">{{ m.corps }}</div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      @if (flash()) {
+        <div class="flash"><i class="ti ti-circle-check"></i> {{ flash() }}</div>
+      }
+
+      @if (mentions().length) {
+        <div class="mention-pop">
+          @for (p of mentions(); track p.username) {
+            <button type="button" (click)="choisirMention(p.username)">
+              <miang-avatar [nom]="p.nom" [couleur]="p.couleur" [taille]="24" />
+              <span class="mu">@{{ p.username }}</span>
+              <span class="mn muted">{{ p.nom }}</span>
+            </button>
+          }
+        </div>
+      }
+
+      <div class="inbar">
+        <input
+          class="inbar-input"
+          [value]="brouillon()"
+          (input)="onInput($any($event.target).value)"
+          (keydown.enter)="envoyer()"
+          placeholder="Message… (@ pour mentionner)"
+        />
+        <button class="send" type="button" (click)="envoyer()" [disabled]="!brouillon().trim()" aria-label="Envoyer">
+          <i class="ti ti-send"></i>
+        </button>
+      </div>
+    } @else {
+      <div class="locked">
+        <div class="lock-card">
+          <i class="ti ti-lock"></i>
+          <div class="lock-title wm">Chat verrouillé</div>
+          <div class="lock-text muted">Mise pour rejoindre la session, discuter et tenter de rafler la cagnotte à 20h.</div>
+        </div>
+
+        @if (insuffisant()) {
+          <p class="error-text">Solde insuffisant. <a class="link" routerLink="/portefeuille">Déposer</a></p>
+        } @else if (error()) {
+          <p class="error-text">{{ error() }}</p>
+        }
+
+        <div class="mise-row">
+          <button class="step" type="button" (click)="ajuster(-s.miseMin)" aria-label="Moins"><i class="ti ti-minus"></i></button>
+          <div class="mise-field">
+            <input class="input" inputmode="numeric" [value]="montant()" (input)="onMise($any($event.target).value)" />
+            <span class="mise-suffix">F</span>
+          </div>
+          <button class="step" type="button" (click)="ajuster(s.miseMin)" aria-label="Plus"><i class="ti ti-plus"></i></button>
+        </div>
+        <button class="btn btn-gold" type="button" [disabled]="busy() || insuffisant() || montant() < s.miseMin" (click)="miser()">
+          @if (busy()) {
+            <span class="spinner"></span>
+          } @else {
+            <i class="ti ti-coin"></i> Miser {{ montant() | fcfa }} & rejoindre
+          }
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (panneauOuvert()) {
+    <div class="panel-dim" (click)="panneauOuvert.set(false)">
+      <div class="panel" (click)="$event.stopPropagation()">
+        <div class="panel-grip"></div>
+        <div class="panel-title">Participants · {{ participants().length }}</div>
+        <div class="panel-list">
+          @for (p of participants(); track p.username) {
+            <button class="prow" type="button" (click)="voirProfil(p.username)">
+              <span class="prow-av">
+                <miang-avatar [nom]="p.nom" [couleur]="p.couleur" [taille]="36" />
+                @if (p.online) { <span class="online-dot"></span> }
+              </span>
+              <span class="prow-info">
+                <span class="prow-name">{{ p.nom }} @if (p.moi) { <span class="text-em">· toi</span> }</span>
+                <span class="prow-sub muted">{{ p.online ? 'en ligne' : 'hors ligne' }} · {{ p.montant | fcfa }}</span>
+              </span>
+              @if (!p.moi) { <i class="ti ti-chevron-right faint"></i> }
+            </button>
+          }
+        </div>
+        <button class="btn btn-outline gold" type="button" (click)="voirTirage()"><i class="ti ti-confetti"></i> Voir le tirage (démo)</button>
+      </div>
+    </div>
+  }
+
+  @if (profilSel(); as u) {
+    <miang-participant-sheet [username]="u" (closed)="profilSel.set(null)" />
+  }
+} @else {
+  <div class="screen">
+    <header class="topbar"><a class="back" routerLink="/accueil"><i class="ti ti-arrow-left"></i> Session</a></header>
+    <div class="empty"><i class="ti ti-mood-empty"></i> Session introuvable.</div>
+  </div>
+}

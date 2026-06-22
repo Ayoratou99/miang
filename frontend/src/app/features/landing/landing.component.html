@@ -1,0 +1,39 @@
+<div class="shell">
+  <div class="screen no-nav landing">
+    <div class="install-row">
+      @if (pwa.canInstall()) {
+        <button class="chip chip-gold install-pill" type="button" (click)="installer()">
+          <i class="ti ti-download"></i> Installer l'app
+        </button>
+      }
+    </div>
+
+    <div class="hero">
+      <miang-logo [taille]="66" />
+      <div class="brand wm">MIANG</div>
+      <p class="slogan">Et si tu devenais millionaire… comme la blague</p>
+    </div>
+
+    <div class="atouts">
+      <div class="atout">
+        <span class="fic"><i class="ti ti-users"></i></span>
+        <span>Mise entre potos, simplement</span>
+      </div>
+      <div class="atout">
+        <span class="fic"><i class="ti ti-clock"></i></span>
+        <span>Un tirage chaque soir à minuit</span>
+      </div>
+      <div class="atout">
+        <span class="fic"><i class="ti ti-wallet"></i></span>
+        <span>Retrait direct par Airtel &amp; Moov</span>
+      </div>
+    </div>
+
+    <div class="cta">
+      <a class="btn btn-gold" routerLink="/inscription">Créer un compte</a>
+      <a class="btn btn-outline" routerLink="/connexion">Se connecter</a>
+    </div>
+
+    <p class="legal">Réservé aux 18 ans et + · Jeu responsable</p>
+  </div>
+</div>

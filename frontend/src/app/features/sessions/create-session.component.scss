@@ -1,0 +1,54 @@
+.mise-input {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--gold);
+}
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 9px;
+}
+.quick-chip {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  color: var(--cream);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 13px;
+  cursor: pointer;
+}
+.quick-chip.on {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+}
+.hint {
+  font-size: 11px;
+  margin-top: 6px;
+}
+.covers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cover-opt {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  font-size: 22px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.cover-opt.on {
+  border-color: var(--gold);
+  background: rgba(243, 182, 31, 0.14);
+  transform: scale(1.05);
+}

@@ -1,0 +1,126 @@
+.draw-head {
+  text-align: center;
+  margin-bottom: 6px;
+}
+.kicker {
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--em);
+  font-weight: 600;
+}
+.clock {
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--cream);
+}
+
+.wheel-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 10px auto 4px;
+}
+.pointer {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 15px solid var(--gold);
+  z-index: 3;
+}
+.wheel {
+  transform-origin: 50% 50%;
+  transition: transform 4.2s cubic-bezier(0.12, 0.85, 0.18, 1);
+}
+
+.status {
+  text-align: center;
+  font-size: 11px;
+  color: var(--em);
+  min-height: 15px;
+  margin-bottom: 8px;
+}
+
+.name-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  border: 2px solid var(--gold-line);
+  background: rgba(243, 182, 31, 0.06);
+  border-radius: 12px;
+  font-size: 20px;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+.name-box.won {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+}
+
+.reveal {
+  text-align: center;
+  margin-top: 14px;
+  animation: pop 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+@keyframes pop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.reveal > i {
+  color: var(--gold);
+  font-size: 24px;
+}
+.reveal.mine > i {
+  color: var(--coral);
+}
+.reveal-kicker {
+  font-size: 10.5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--em);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.reveal-name {
+  font-size: 22px;
+  color: var(--gold);
+  margin: 2px 0;
+}
+.reveal-amount {
+  font-size: 12.5px;
+}
+.fair {
+  margin-top: 10px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.fair i {
+  color: var(--em);
+  vertical-align: -1px;
+}
+.fair code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--cream);
+  opacity: 0.7;
+}
+
+.spin {
+  margin-top: 18px;
+}

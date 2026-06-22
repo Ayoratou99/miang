@@ -1,0 +1,212 @@
+.balance {
+  text-align: center;
+  border-radius: 16px;
+  padding: 16px;
+}
+.balance-amount {
+  font-size: 32px;
+  margin: 4px 0;
+}
+.balance .muted {
+  font-size: 11px;
+}
+.upd {
+  font-size: 10px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.actions .btn {
+  flex: 1;
+}
+
+.opr {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 11px;
+  margin-bottom: 9px;
+}
+.opr-ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.opr-ic i {
+  color: #fff;
+  font-size: 18px;
+}
+.opr-ic.sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+}
+.opr-ic.sm i {
+  font-size: 13px;
+}
+.opr-info {
+  flex: 1;
+}
+.opr-name {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.opr-num {
+  font-size: 10px;
+}
+
+.txns {
+  display: flex;
+  flex-direction: column;
+}
+.txn {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+.txn:first-child {
+  border-top: none;
+}
+.txn-ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--surface-2);
+  color: var(--cream);
+}
+.txn-ic.gain {
+  background: var(--gold-dim);
+  color: var(--gold);
+}
+.txn-ic i {
+  font-size: 17px;
+}
+.txn-info {
+  flex: 1;
+  min-width: 0;
+}
+.txn-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+.txn-date {
+  font-size: 10px;
+}
+.txn-amount {
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Deposit / withdraw sheet ──────────────────────────────────── */
+.sheet-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fade 0.2s ease both;
+}
+.sheet {
+  width: 100%;
+  max-width: var(--maxw);
+  background: var(--ink-2);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 22px 22px 0 0;
+  padding: 14px 16px calc(20px + env(safe-area-inset-bottom));
+  animation: slideup 0.28s cubic-bezier(0.2, 1, 0.3, 1) both;
+}
+@keyframes slideup {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.sheet-grip {
+  width: 38px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line-2);
+  margin: 0 auto 12px;
+}
+.sheet-title {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.montant-input {
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--gold);
+}
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 9px;
+}
+.quick-chip {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  color: var(--cream);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 13px;
+  cursor: pointer;
+}
+.quick-chip.on {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+}
+.op-picker {
+  display: flex;
+  gap: 9px;
+}
+.op-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  padding: 10px;
+  color: var(--cream);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.op-card.on {
+  border-color: var(--gold);
+  background: rgba(243, 182, 31, 0.08);
+}
+.sheet-cta {
+  margin-top: 16px;
+  margin-bottom: 8px;
+}

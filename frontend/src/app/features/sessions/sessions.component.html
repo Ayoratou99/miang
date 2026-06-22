@@ -1,0 +1,90 @@
+<div class="screen">
+  <header class="home-head">
+    <div class="brand-row">
+      <miang-logo [taille]="30" />
+      <span class="brand wm">MIANG</span>
+    </div>
+    <div class="head-actions">
+      <a class="chip chip-em" routerLink="/portefeuille"><i class="ti ti-wallet"></i> {{ solde() | fcfa }}</a>
+      <a routerLink="/profil" aria-label="Profil">
+        <miang-avatar [nom]="user()?.nom ?? ''" [couleur]="user()?.couleur ?? 'forest'" [taille]="34" />
+      </a>
+    </div>
+  </header>
+
+  <div class="search-row">
+    <div class="search-box">
+      <i class="ti ti-search"></i>
+      <input
+        [value]="recherche()"
+        (input)="onRecherche($any($event.target).value)"
+        placeholder="Rechercher une session…"
+      />
+      @if (recherche()) {
+        <button class="clear" type="button" (click)="onRecherche('')" aria-label="Effacer"><i class="ti ti-x"></i></button>
+      }
+    </div>
+    <button class="filter-btn" type="button" [class.on]="filtresOuverts()" (click)="filtresOuverts.set(!filtresOuverts())" aria-label="Filtres">
+      <i class="ti ti-adjustments-horizontal"></i>
+    </button>
+  </div>
+
+  @if (filtresOuverts()) {
+    <div class="filters card">
+      <div class="filter-grp">
+        <span class="filter-lbl">Mise (F)</span>
+        <div class="filter-row">
+          <input class="input" inputmode="numeric" placeholder="min" [value]="montantMin() ?? ''" (input)="montantMin.set(num($any($event.target).value))" />
+          <input class="input" inputmode="numeric" placeholder="max" [value]="montantMax() ?? ''" (input)="montantMax.set(num($any($event.target).value))" />
+        </div>
+      </div>
+      <div class="filter-grp">
+        <span class="filter-lbl">Joueurs</span>
+        <div class="filter-row">
+          <input class="input" inputmode="numeric" placeholder="min" [value]="joueursMin() ?? ''" (input)="joueursMin.set(num($any($event.target).value))" />
+          <input class="input" inputmode="numeric" placeholder="max" [value]="joueursMax() ?? ''" (input)="joueursMax.set(num($any($event.target).value))" />
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-ghost" type="button" (click)="reinitialiser()">Réinitialiser</button>
+        <button class="btn btn-gold" type="button" (click)="appliquerFiltres()">Appliquer</button>
+      </div>
+    </div>
+  }
+
+  <h2 class="home-title">Sessions en cours</h2>
+
+  <div class="sessions">
+    @for (s of items(); track s.id) {
+      <button class="card tap session" type="button" (click)="ouvrir(s)">
+        @if (s.coverImage) {
+          <span class="cover" [class]="'cv-' + s.id.length % 4">{{ s.coverImage }}</span>
+        }
+        <span class="session-body">
+          <span class="session-top">
+            <span class="session-name">{{ s.titre }}</span>
+            <span class="chip chip-gold"><i class="ti ti-clock"></i> <miang-countdown [cible]="s.drawAt" [format]="'court'" /></span>
+          </span>
+          <span class="amount session-pot">{{ s.potTotal | fcfa }}</span>
+          <span class="session-meta muted">
+            mise min. {{ s.miseMin | fcfa: false }} F ·
+            {{ s.joueurs }} {{ s.maxParticipants ? '/ ' + s.maxParticipants : '' }} joueurs
+            @if (!s.maxParticipants) { · illimité }
+            @if (s.inscrit) { <span class="chip chip-em mine"><i class="ti ti-coin"></i> misé</span> }
+            @if (s.complet) { <span class="chip chip-coral mine">complet</span> }
+          </span>
+        </span>
+      </button>
+    } @empty {
+      @if (!loading()) {
+        <div class="empty"><i class="ti ti-cards"></i> Aucune session ne correspond. Crée la tienne !</div>
+      }
+    }
+    @if (loading()) {
+      <div class="loading-row"><span class="spinner"></span></div>
+    }
+    <div miangInfiniteScroll [disabled]="loading() || !hasMore()" (reached)="chargerSuite()"></div>
+  </div>
+
+  <a class="btn btn-gold create" routerLink="/creer-session"><i class="ti ti-plus"></i> Créer une session</a>
+</div>

@@ -1,0 +1,22 @@
+# Merged automatically on top of docker-compose.yml by `docker compose up`.
+# Dev hot-reload: mount source, use the builder stage (keeps dev deps).
+services:
+  api:
+    build:
+      target: builder
+    command: npm run start:dev
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+
+  worker:
+    build:
+      target: builder
+    command: npm run start:worker:dev
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma

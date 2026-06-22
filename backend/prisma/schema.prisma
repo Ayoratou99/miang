@@ -1,0 +1,376 @@
+// MIANG — data model.
+// Money is FCFA (XAF), stored as integers (Int) — no decimals, ever.
+// The ledger is append-only; balances change only inside PG transactions.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────── Enums ──
+enum KycStatut {
+  aucun
+  en_attente
+  verifie
+}
+
+enum OtpCanal {
+  whatsapp
+  sms
+}
+
+enum LedgerType {
+  depot
+  retrait
+  mise
+  gain
+  remboursement
+}
+
+enum PaymentProvider {
+  airtel
+  moov
+}
+
+enum PaymentDirection {
+  depot
+  retrait
+}
+
+enum PaymentStatut {
+  pending
+  success
+  failed
+}
+
+enum SessionStatut {
+  open
+  locked
+  drawn
+}
+
+enum ConversationType {
+  session
+  prive
+}
+
+enum MessageType {
+  text
+  system
+}
+
+enum FriendStatut {
+  pending
+  accepted
+  declined
+}
+
+// ─────────────────────────────────────────────────────── Identité ──
+model User {
+  id           String    @id @default(uuid())
+  nom          String
+  username     String    @unique
+  phone        String    @unique
+  phoneVerifie Boolean   @default(false)
+  motDePasse   String
+  avatarUrl    String?
+  couleur      String    @default("forest")
+  kyc          KycStatut @default(aucun)
+  banni        Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  wallet           Wallet?
+  refreshTokens    RefreshToken[]
+  otpRequests      OtpRequest[]
+  paymentIntents   PaymentIntent[]
+  createdSessions  Session[]                   @relation("SessionCreator")
+  stakes           Stake[]
+  wins             DrawResult[]                @relation("DrawWinner")
+  participations   ConversationParticipant[]
+  messages         Message[]
+  friendRequests   Friendship[]                @relation("FriendRequester")
+  friendAddressed  Friendship[]                @relation("FriendAddressee")
+  blocking         Block[]                     @relation("Blocker")
+  blockedBy        Block[]                     @relation("Blocked")
+  pushSubs         PushSubscription[]
+  notifications    Notification[]
+  roles            UserRole[]
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model OtpRequest {
+  id         String    @id @default(uuid())
+  userId     String?
+  phone      String
+  codeHash   String
+  canal      OtpCanal  @default(whatsapp)
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([phone])
+}
+
+// ─────────────────────────────────────────────────────────── Argent ──
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  soldeFcfa Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries LedgerEntry[]
+}
+
+/// Append-only ledger. One row per balance movement; never updated or deleted.
+model LedgerEntry {
+  id              String      @id @default(uuid())
+  walletId        String
+  type            LedgerType
+  montant         Int // signed: crédit > 0, débit < 0
+  soldeApres      Int
+  ref             String?
+  sessionId       String?
+  paymentIntentId String?
+  createdAt       DateTime    @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt])
+}
+
+model PaymentIntent {
+  id             String           @id @default(uuid())
+  userId         String
+  provider       PaymentProvider
+  direction      PaymentDirection
+  montant        Int
+  statut         PaymentStatut    @default(pending)
+  phone          String?
+  refProvider    String?
+  idempotencyKey String           @unique
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ───────────────────────────────────────────────────────────── Jeu ──
+model Session {
+  id             String        @id @default(uuid())
+  titre          String
+  miseMin        Int
+  potTotal       Int           @default(0)
+  statut         SessionStatut @default(open)
+  drawAt         DateTime
+  createdById    String
+  serverSeed     String // secret until the draw is revealed
+  serverSeedHash String // published before midnight (provably-fair commitment)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  createdBy    User          @relation("SessionCreator", fields: [createdById], references: [id])
+  stakes       Stake[]
+  drawResult   DrawResult?
+  conversation Conversation?
+
+  @@index([statut, drawAt])
+}
+
+model Stake {
+  id        String   @id @default(uuid())
+  sessionId String
+  userId    String
+  montant   Int
+  createdAt DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId])
+}
+
+model DrawResult {
+  id             String   @id @default(uuid())
+  sessionId      String   @unique
+  winnerId       String
+  montant        Int
+  serverSeedHash String
+  serverSeed     String
+  clientSeed     String
+  nonce          Int
+  drawnAt        DateTime @default(now())
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  winner  User    @relation("DrawWinner", fields: [winnerId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────── Social ──
+model Conversation {
+  id        String           @id @default(uuid())
+  type      ConversationType
+  titre     String?
+  sessionId String?          @unique
+  createdAt DateTime         @default(now())
+
+  session      Session?                  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String    @id @default(uuid())
+  conversationId String
+  userId         String
+  lastReadAt     DateTime?
+  joinedAt       DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  conversationId String
+  authorId       String? // null = système (« X a misé 5 000 F »)
+  type           MessageType @default(text)
+  corps          String
+  createdAt      DateTime    @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  author       User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, createdAt])
+}
+
+model Friendship {
+  id          String       @id @default(uuid())
+  requesterId String
+  addresseeId String
+  statut      FriendStatut @default(pending)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  requester User @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId])
+}
+
+model Block {
+  id        String   @id @default(uuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  blocker User @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+}
+
+// ──────────────────────────────────────────────────────── Transverse ──
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  appareil  String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  titre     String
+  corps     String
+  lu        Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, lu])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String?
+  action    String
+  cible     String?
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([action, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────── RBAC ──
+model Permission {
+  id    String @id @default(uuid())
+  code  String @unique // ex: "session:create", "wallet:withdraw"
+
+  roles RolePermission[]
+}
+
+model Role {
+  id      String @id @default(uuid())
+  code    String @unique // player, moderator, finance, admin, superadmin
+  libelle String
+
+  permissions RolePermission[]
+  users       UserRole[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  userId String
+  roleId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}

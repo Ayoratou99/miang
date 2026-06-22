@@ -1,0 +1,46 @@
+<div class="shell">
+  <div class="screen no-nav auth">
+    <a class="auth-back" routerLink="/inscription"><i class="ti ti-arrow-left"></i> Vérification</a>
+
+    <div class="verify-head">
+      <div class="wa-circle"><i class="ti ti-brand-whatsapp"></i></div>
+      <div class="vt wm">Vérifie ton numéro</div>
+      <div class="vs">On a envoyé un code sur WhatsApp au<br /><span class="text-em" style="color: var(--cream)">{{ masque() }}</span></div>
+    </div>
+
+    <div class="otp-row">
+      @for (c of chiffres(); track $index) {
+        <input
+          #otp
+          class="otp"
+          maxlength="1"
+          inputmode="numeric"
+          [value]="c"
+          (input)="onInput($index, $event)"
+          (keydown)="onKeydown($index, $event)"
+        />
+      }
+    </div>
+
+    @if (error()) {
+      <p class="error-text" style="text-align: center">{{ error() }}</p>
+    }
+
+    <button class="btn btn-gold" type="button" [disabled]="loading() || !complet()" (click)="verifier()">
+      @if (loading()) {
+        <span class="spinner"></span>
+      } @else {
+        Vérifier
+      }
+    </button>
+
+    <p class="resend spacer">
+      Pas reçu ?
+      @if (compte() > 0) {
+        <span class="muted">Renvoyer ({{ compteTexte() }})</span>
+      } @else {
+        <span class="link" (click)="renvoyer()">Renvoyer</span>
+      }
+    </p>
+  </div>
+</div>

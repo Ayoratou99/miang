@@ -1,0 +1,88 @@
+<div class="screen">
+  <header class="topbar">
+    <a class="back" routerLink="/profil"><i class="ti ti-arrow-left"></i> Amis</a>
+  </header>
+
+  <div class="search-box">
+    <i class="ti ti-user-search"></i>
+    <input
+      [value]="recherche()"
+      (input)="onRecherche($any($event.target).value)"
+      placeholder="Chercher un joueur (@pseudo ou nom)…"
+    />
+    @if (recherche()) {
+      <button class="clear" type="button" (click)="onRecherche('')" aria-label="Effacer"><i class="ti ti-x"></i></button>
+    }
+  </div>
+
+  @if (recherche()) {
+    <div class="section-label">Résultats</div>
+    <div class="list">
+      @for (r of resultats(); track r.username) {
+        <div class="frow">
+          <button class="frow-tap" type="button" (click)="voirProfil(r.username)">
+            <span class="frow-av">
+              <miang-avatar [nom]="r.nom" [couleur]="r.couleur" [taille]="40" />
+              @if (r.online) { <span class="online-dot"></span> }
+            </span>
+            <span class="frow-info">
+              <span class="frow-name">{{ r.nom }}</span>
+              <span class="frow-user muted">@{{ r.username }}</span>
+            </span>
+          </button>
+          @if (r.estAmi) {
+            <span class="chip chip-em"><i class="ti ti-check"></i> ami</span>
+          } @else if (r.demandeEnvoyee) {
+            <span class="chip chip-gold"><i class="ti ti-clock"></i> envoyée</span>
+          } @else {
+            <button class="add-btn" type="button" (click)="ajouter(r.username)" aria-label="Ajouter"><i class="ti ti-user-plus"></i></button>
+          }
+        </div>
+      } @empty {
+        <div class="empty"><i class="ti ti-search-off"></i> Aucun joueur pour « {{ recherche() }} ».</div>
+      }
+    </div>
+  } @else {
+    @if (demandes().length) {
+      <div class="section-label">Demandes ({{ demandes().length }})</div>
+      @for (d of demandes(); track d.id) {
+        <div class="frow">
+          <button class="frow-tap" type="button" (click)="voirProfil(d.username)">
+            <miang-avatar [nom]="d.nom" [couleur]="d.couleur" [taille]="40" />
+            <span class="frow-info">
+              <span class="frow-name">{{ d.nom }}</span>
+              <span class="frow-user muted">@{{ d.username }}</span>
+            </span>
+          </button>
+          <div class="req-actions">
+            <button class="req accept" type="button" (click)="accepter(d.id)" aria-label="Accepter"><i class="ti ti-check"></i></button>
+            <button class="req refuse" type="button" (click)="refuser(d.id)" aria-label="Refuser"><i class="ti ti-x"></i></button>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="section-label">Mes amis ({{ amis().length }})</div>
+    <div class="list">
+      @for (a of amis(); track a.id) {
+        <button class="frow frow-tap full" type="button" (click)="voirProfil(a.username)">
+          <span class="frow-av">
+            <miang-avatar [nom]="a.nom" [couleur]="a.couleur" [taille]="40" />
+            @if (a.enLigne) { <span class="online-dot"></span> }
+          </span>
+          <span class="frow-info">
+            <span class="frow-name">{{ a.nom }}</span>
+            <span class="frow-user muted">@{{ a.username }} @if (a.enLigne) { <span class="text-em">· en ligne</span> }</span>
+          </span>
+          <i class="ti ti-chevron-right faint"></i>
+        </button>
+      } @empty {
+        <div class="empty"><i class="ti ti-user-plus"></i> Pas encore d'amis. Cherche un pseudo ci-dessus !</div>
+      }
+    </div>
+  }
+
+  @if (profilSel(); as u) {
+    <miang-participant-sheet [username]="u" (closed)="profilSel.set(null)" />
+  }
+</div>

@@ -1,0 +1,138 @@
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 239, 225, 0.06);
+  border: 1px solid var(--line-2);
+  border-radius: 11px;
+  padding: 0 12px;
+  margin-bottom: 6px;
+}
+.search-box i {
+  color: var(--em);
+  font-size: 16px;
+}
+.search-box input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--cream);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 11px 0;
+}
+.search-box input::placeholder {
+  color: var(--faint);
+}
+.search-box .clear {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+.frow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 0;
+}
+.list .frow,
+.list .frow.full {
+  border-top: 1px solid var(--line);
+}
+.list .frow:first-child {
+  border-top: none;
+}
+.frow-tap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: none;
+  border: none;
+  color: var(--cream);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+.frow.full {
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  width: 100%;
+  cursor: pointer;
+  color: var(--cream);
+  font: inherit;
+}
+.frow-av {
+  position: relative;
+}
+.online-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--em);
+  border: 2px solid var(--ink);
+}
+.frow-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.frow-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+.frow-user {
+  font-size: 11px;
+}
+.add-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(22, 160, 122, 0.5);
+  background: transparent;
+  color: var(--em);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.req-actions {
+  display: flex;
+  gap: 7px;
+}
+.req {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+.req.accept {
+  background: var(--em);
+  color: var(--ink);
+}
+.req.refuse {
+  background: var(--surface-2);
+  color: var(--muted);
+}

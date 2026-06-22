@@ -1,0 +1,32 @@
+<div class="screen">
+  <header class="topbar">
+    <a class="back" routerLink="/profil"><i class="ti ti-arrow-left"></i> Historique des sessions</a>
+  </header>
+
+  <div class="list">
+    @for (s of items(); track s.id) {
+      <button class="card tap hrow" type="button" (click)="ouvrir(s)">
+        <div class="hrow-top">
+          <div class="hrow-title">
+            @if (s.coverImage) { <span class="cv">{{ s.coverImage }}</span> }
+            {{ s.titre }}
+          </div>
+          @if (estMonGain(s)) {
+            <span class="chip chip-gold"><i class="ti ti-trophy"></i> Gagné</span>
+          } @else {
+            <span class="chip" style="background: var(--surface-2); color: var(--muted)">Perdu</span>
+          }
+        </div>
+        <div class="hrow-win muted">
+          <i class="ti ti-trophy"></i> Gagnant : <span class="text-gold">{{ estMonGain(s) ? 'toi' : '@' + s.gagnantUsername }}</span>
+          · {{ s.potTotal | fcfa }}
+        </div>
+        <div class="hrow-meta muted">
+          {{ quand(s.drawAt) }} · {{ s.joueurs }} joueurs · ta mise {{ s.maMise | fcfa }}
+        </div>
+      </button>
+    } @empty {
+      <div class="empty"><i class="ti ti-history"></i> Aucune session terminée pour l'instant.</div>
+    }
+  </div>
+</div>

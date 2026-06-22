@@ -1,0 +1,21 @@
+{
+  "name": "MIANG",
+  "short_name": "MIANG",
+  "description": "Deviens millionaire… comme la blague. Mise dans une cagnotte commune, tirage à minuit.",
+  "theme_color": "#07140F",
+  "background_color": "#07140F",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "lang": "fr",
+  "categories": ["games", "social", "finance"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

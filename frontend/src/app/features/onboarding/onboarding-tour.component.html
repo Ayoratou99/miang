@@ -1,0 +1,25 @@
+<div class="tour-dim">
+  <div class="tour-card">
+    <div class="tour-head">
+      <miang-miango [taille]="58" />
+      <div class="tour-body">
+        <div class="tour-kicker">MIANGO</div>
+        <div class="tour-title wm">{{ etape().titre }}</div>
+        <div class="tour-text">{{ etape().texte }}</div>
+      </div>
+    </div>
+    <div class="tour-foot">
+      <div class="tour-dots">
+        @for (e of etapes; track e.titre; let idx = $index) {
+          <span class="dot" [class.on]="idx === i()"></span>
+        }
+      </div>
+      <button class="tour-btn" type="button" (click)="suivant()">
+        {{ dernier() ? 'C’est parti !' : 'Suivant' }}
+      </button>
+    </div>
+  </div>
+  @if (!dernier()) {
+    <button class="tour-skip" type="button" (click)="passer()">Passer le guide</button>
+  }
+</div>

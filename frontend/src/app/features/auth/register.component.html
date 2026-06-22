@@ -1,0 +1,58 @@
+<div class="shell">
+  <div class="screen no-nav auth">
+    <a class="auth-back" routerLink="/bienvenue"><i class="ti ti-arrow-left"></i> Créer un compte</a>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <div class="field">Nom complet</div>
+        <input class="input" formControlName="nom" placeholder="Kevin Mba" autocomplete="name" />
+      </div>
+      <div>
+        <div class="field">Nom d'utilisateur</div>
+        <input class="input" formControlName="username" placeholder="@kevin_mba" autocomplete="username" />
+      </div>
+      <div>
+        <div class="field">Numéro de téléphone</div>
+        <div class="input-row">
+          <span class="prefix">{{ prefixe }}</span>
+          <input
+            class="input"
+            formControlName="phone"
+            placeholder="06 00 00 41"
+            inputmode="numeric"
+            autocomplete="tel-national"
+          />
+        </div>
+      </div>
+      <div>
+        <div class="field">Mot de passe</div>
+        <input
+          class="input"
+          formControlName="motDePasse"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="new-password"
+        />
+      </div>
+
+      <div class="alert alert-wa">
+        <i class="ti ti-brand-whatsapp"></i>
+        <div>On vérifiera ton numéro par <span class="text-em" style="color: var(--wa)">WhatsApp</span> en t'envoyant un code.</div>
+      </div>
+
+      @if (error()) {
+        <p class="error-text">{{ error() }}</p>
+      }
+
+      <button class="btn btn-gold" type="submit" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner"></span>
+        } @else {
+          Continuer
+        }
+      </button>
+    </form>
+
+    <p class="switch">Déjà inscrit ? <a class="link" routerLink="/connexion">Se connecter</a></p>
+  </div>
+</div>

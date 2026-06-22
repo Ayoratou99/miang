@@ -1,0 +1,62 @@
+.hello {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hello-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.hello-text {
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.para {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--cream);
+  opacity: 0.92;
+  margin: 0;
+}
+
+.step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 11px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.guide-btn {
+  margin-top: 18px;
+}
+
+.foot {
+  text-align: center;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.foot-brand {
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+.foot .muted {
+  font-size: 10px;
+}

@@ -1,0 +1,36 @@
+<div class="shell">
+  @if (!installDismissed() && (pwa.canInstall() || (pwa.isIos && !pwa.isStandalone))) {
+    <div class="install-banner">
+      <i class="ti ti-device-mobile-down"></i>
+      @if (pwa.canInstall()) {
+        <span>Installe MIANG sur ton téléphone.</span>
+        <button class="ib-cta" type="button" (click)="installer()">Installer</button>
+      } @else {
+        <span>Installer : <i class="ti ti-share"></i> Partager → « Sur l'écran d'accueil ».</span>
+      }
+      <button class="ib-x" type="button" (click)="installDismissed.set(true)" aria-label="Fermer">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  }
+
+  <router-outlet />
+
+  <nav class="bottom-nav">
+    @for (item of nav; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="on" [attr.aria-label]="item.label">
+        <span class="bn-ic">
+          <i class="ti {{ item.icon }}"></i>
+          @if (item.path === '/messages' && unread() > 0) {
+            <span class="bn-badge">{{ unread() }}</span>
+          }
+        </span>
+        <span class="bn-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  @if (onboarding.visible()) {
+    <miang-onboarding-tour />
+  }
+</div>

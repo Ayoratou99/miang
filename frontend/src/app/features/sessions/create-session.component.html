@@ -1,0 +1,54 @@
+<div class="screen">
+  <header class="topbar">
+    <a class="back" routerLink="/accueil"><i class="ti ti-arrow-left"></i> Créer une session</a>
+  </header>
+
+  <div class="form">
+    <div>
+      <div class="field">Titre de la session</div>
+      <input class="input" [value]="titre()" (input)="titre.set($any($event.target).value)" placeholder="Soirée des potos" maxlength="40" />
+    </div>
+
+    <div>
+      <div class="field">Mise minimale (F)</div>
+      <input class="input mise-input" inputmode="numeric" [value]="miseMin() || ''" (input)="onMise($any($event.target).value)" placeholder="1 000" />
+      <div class="quick">
+        @for (m of misesRapides; track m) {
+          <button type="button" class="quick-chip" [class.on]="miseMin() === m" (click)="miseMin.set(m)">{{ m | fcfa: false }}</button>
+        }
+      </div>
+    </div>
+
+    <div>
+      <div class="field">Participants maximum</div>
+      <input class="input" inputmode="numeric" [value]="maxParticipants() ?? ''" (input)="onMax($any($event.target).value)" placeholder="illimité" />
+      <div class="hint muted">Laisse vide pour un nombre <strong>illimité</strong> de participants.</div>
+    </div>
+
+    <div>
+      <div class="field">Couverture (optionnel)</div>
+      <div class="covers">
+        @for (c of covers; track c) {
+          <button type="button" class="cover-opt" [class.on]="cover() === c" (click)="toggleCover(c)">{{ c }}</button>
+        }
+      </div>
+    </div>
+
+    <div class="alert" style="background: var(--surface); border: 1px solid var(--line)">
+      <i class="ti ti-bulb" style="color: var(--gold)"></i>
+      <div class="muted">À <strong>20h00</strong> pile, un tirage aléatoire vérifiable désigne un seul gagnant qui rafle toute la cagnotte.</div>
+    </div>
+
+    @if (error()) {
+      <p class="error-text">{{ error() }}</p>
+    }
+
+    <button class="btn btn-gold" type="button" [disabled]="!valide() || busy()" (click)="submit()">
+      @if (busy()) {
+        <span class="spinner"></span> Création…
+      } @else {
+        <i class="ti ti-plus"></i> Créer la session
+      }
+    </button>
+  </div>
+</div>

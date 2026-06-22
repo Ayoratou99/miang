@@ -1,0 +1,84 @@
+@if (conversation(); as c) {
+  <div class="chat">
+    <header class="chat-head">
+      <a class="back-ic" routerLink="/messages"><i class="ti ti-arrow-left"></i></a>
+      <button class="chat-id" type="button" (click)="profilOuvert.set(true)" [disabled]="!c.autreUsername">
+        <miang-avatar [nom]="c.titre" [couleur]="c.couleur" [taille]="32" />
+        <span class="chat-id-txt">
+          <span class="chat-title">{{ c.titre }}</span>
+          @if (c.enLigne) { <span class="chat-sub text-em">en ligne</span> }
+          @else { <span class="chat-sub muted">voir le profil</span> }
+        </span>
+      </button>
+    </header>
+
+    <div class="msgs" #liste (scroll)="onScroll()">
+      @if (loadingOlder()) { <div class="older"><span class="spinner"></span></div> }
+      @for (m of messages(); track m.id) {
+        @if (m.type === 'system') {
+          <div class="sys"><span>{{ m.corps }}</span></div>
+        } @else if (m.type === 'invite') {
+          <div class="row" [class.mine]="m.moi">
+            <div class="invite-card">
+              <div class="invite-top"><i class="ti ti-ticket"></i> Invitation à une session</div>
+              <div class="invite-title wm">{{ m.inviteTitre }}</div>
+              <div class="invite-sub muted">mise min. {{ m.inviteMiseMin | fcfa }}</div>
+              <button class="btn btn-gold invite-btn" type="button" (click)="rejoindre(m.inviteSessionId)">
+                <i class="ti ti-arrow-right"></i> Rejoindre
+              </button>
+            </div>
+          </div>
+        } @else if (m.moi) {
+          <div class="row mine"><div class="bub mine">{{ m.corps }}</div></div>
+        } @else {
+          <div class="row"><div class="bub">{{ m.corps }}</div></div>
+        }
+      }
+    </div>
+
+    <div class="inbar">
+      <button class="add" type="button" (click)="ouvrirInvite()" aria-label="Inviter à une session"><i class="ti ti-plus"></i></button>
+      <input
+        class="inbar-input"
+        [value]="brouillon()"
+        (input)="brouillon.set($any($event.target).value)"
+        (keydown.enter)="envoyer()"
+        placeholder="Message…"
+      />
+      <button class="send" type="button" (click)="envoyer()" [disabled]="!brouillon().trim()" aria-label="Envoyer">
+        <i class="ti ti-send"></i>
+      </button>
+    </div>
+  </div>
+
+  @if (inviteOuvert()) {
+    <div class="sheet-dim" (click)="inviteOuvert.set(false)">
+      <div class="sheet" (click)="$event.stopPropagation()">
+        <div class="sheet-grip"></div>
+        <div class="sheet-title">Inviter à une session</div>
+        <div class="sheet-list">
+          @for (s of mesSessions(); track s.id) {
+            <button class="srow" type="button" (click)="envoyerInvite(s.id)">
+              <span class="srow-info">
+                <span class="srow-name">{{ s.titre }}</span>
+                <span class="srow-sub muted">mise min. {{ s.miseMin | fcfa: false }} F · {{ s.joueurs }} joueurs</span>
+              </span>
+              <i class="ti ti-send text-gold"></i>
+            </button>
+          } @empty {
+            <div class="empty"><i class="ti ti-cards"></i> Aucune session ouverte.</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (profilOuvert() && c.autreUsername) {
+    <miang-participant-sheet [username]="c.autreUsername" (closed)="profilOuvert.set(false)" />
+  }
+} @else {
+  <div class="screen">
+    <header class="topbar"><a class="back" routerLink="/messages"><i class="ti ti-arrow-left"></i> Conversation</a></header>
+    <div class="empty"><i class="ti ti-mood-empty"></i> Conversation introuvable.</div>
+  </div>
+}

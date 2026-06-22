@@ -1,0 +1,102 @@
+<div class="screen">
+  <header class="topbar">
+    <a class="back" routerLink="/accueil"><i class="ti ti-arrow-left"></i> Portefeuille</a>
+  </header>
+
+  <div class="card gold balance">
+    <div class="muted">Solde disponible</div>
+    <div class="amount balance-amount">{{ solde() | fcfa }}</div>
+    <div class="muted upd">mis à jour à l'instant</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-outline" type="button" (click)="ouvrir('depot')">
+      <i class="ti ti-plus"></i> Déposer
+    </button>
+    <button class="btn btn-gold" type="button" (click)="ouvrir('retrait')">
+      <i class="ti ti-arrow-down"></i> Retirer
+    </button>
+  </div>
+
+  <div class="section-label">Comptes Mobile Money</div>
+  @for (op of operateurs; track op.id) {
+    <div class="opr">
+      <span class="opr-ic" [style.background]="op.couleur"><i class="ti ti-device-mobile"></i></span>
+      <div class="opr-info">
+        <div class="opr-name">{{ op.nom }}</div>
+        <div class="opr-num muted">{{ op.numeroMasque ?? 'ajouter un numéro' }}</div>
+      </div>
+      <i class="ti ti-chevron-right faint"></i>
+    </div>
+  }
+
+  <div class="section-label">Transactions récentes</div>
+  <div class="txns">
+    @for (tx of transactions(); track tx.id) {
+      <div class="txn">
+        <span class="txn-ic" [class.gain]="tx.type === 'gain'">
+          <i class="ti {{ icone(tx.type) }}"></i>
+        </span>
+        <div class="txn-info">
+          <div class="txn-label">{{ tx.libelle }}</div>
+          <div class="txn-date muted">{{ quand(tx.date) }}</div>
+        </div>
+        <div class="txn-amount" [class]="classeMontant(tx)">
+          {{ signe(tx) }}{{ tx.montant | fcfa }}
+        </div>
+      </div>
+    } @empty {
+      <div class="empty"><i class="ti ti-receipt-off"></i> Aucune transaction.</div>
+    }
+  </div>
+</div>
+
+@if (mode(); as m) {
+  <div class="sheet-dim" (click)="fermer()">
+    <div class="sheet" (click)="$event.stopPropagation()">
+      <div class="sheet-grip"></div>
+      <h3 class="sheet-title wm">{{ m === 'depot' ? 'Déposer' : 'Retirer' }}</h3>
+
+      <div class="field">Montant</div>
+      <div class="input-row">
+        <input class="input montant-input" inputmode="numeric" [value]="montant() ?? ''" (input)="onMontant($event)" placeholder="0" />
+        <span class="prefix">F</span>
+      </div>
+      <div class="quick">
+        @for (q of misesRapides; track q) {
+          <button type="button" class="quick-chip" [class.on]="montant() === q" (click)="montant.set(q)">
+            {{ q | fcfa: false }}
+          </button>
+        }
+      </div>
+
+      <div class="field">{{ m === 'depot' ? 'Depuis' : 'Vers' }}</div>
+      <div class="op-picker">
+        @for (op of operateurs; track op.id) {
+          <button
+            type="button"
+            class="op-card"
+            [class.on]="operateur() === op.id"
+            (click)="operateur.set(op.id)"
+          >
+            <span class="opr-ic sm" [style.background]="op.couleur"><i class="ti ti-device-mobile"></i></span>
+            {{ op.nom }}
+          </button>
+        }
+      </div>
+
+      @if (error()) {
+        <p class="error-text">{{ error() }}</p>
+      }
+
+      <button class="btn btn-gold sheet-cta" type="button" [disabled]="busy()" (click)="confirmer()">
+        @if (busy()) {
+          <span class="spinner"></span>
+        } @else {
+          {{ m === 'depot' ? 'Déposer' : 'Retirer' }} {{ montant() ? (montant() | fcfa) : '' }}
+        }
+      </button>
+      <button class="btn btn-ghost" type="button" (click)="fermer()">Annuler</button>
+    </div>
+  </div>
+}
